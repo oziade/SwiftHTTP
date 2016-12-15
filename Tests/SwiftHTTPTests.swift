@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import UIKit
 import SwiftHTTP
 
 class SwiftHTTPTests: XCTestCase {
@@ -23,77 +22,90 @@ class SwiftHTTPTests: XCTestCase {
     }
     
     func testGetRequest() {
-        let expectation = expectationWithDescription("testGetRequest")
+        let expectation = self.expectation(description: "testGetRequest")
         
-        let request = HTTPTask()
-        request.GET("http://vluxe.io", parameters: nil, completionHandler: {(response: HTTPResponse)  in
-            if let err = response.error {
-                XCTAssert(false, "Failure")
+        do {
+            let opt = try HTTP.GET("https://google.com", parameters: nil)
+            opt.start { response in
+                if response.error != nil {
+                    XCTAssert(false, "Failure")
+                }
+                XCTAssert(true, "Pass")
+                expectation.fulfill()
             }
-            XCTAssert(true, "Pass")
-            expectation.fulfill()
-        })
-        
-        waitForExpectationsWithTimeout(30, handler: nil)
-    }
-    
-    func testAuthRequest() {
-        let expectation = expectationWithDescription("testAuthRequest")
-
-        let request = HTTPTask()
-        var attempted = false
-        request.auth = {(challenge: NSURLAuthenticationChallenge) in
-            if !attempted {
-                attempted = true
-                return NSURLCredential(user: "user", password: "passwd", persistence: .ForSession)
-            }
-            return nil
+        } catch {
+            XCTAssert(false, "Failure")
         }
-        request.GET("http://httpbin.org/basic-auth/user/passwd", parameters: nil, completionHandler: {(response: HTTPResponse) in
-            if let err = response.error {
-                XCTAssert(false, "Failure")
-            }
-            XCTAssert(true, "Pass")
-            expectation.fulfill()
-        })
-        
-        waitForExpectationsWithTimeout(30, handler: nil)
+        waitForExpectations(timeout: 30, handler: nil)
     }
-    
+	
+	func testGetProgress() {
+		let expectation1 = expectation(description: "testGetProgressFinished")
+		let expectation2 = expectation(description: "testGetProgressIncremented")
+
+		do {
+			let opt = try HTTP.GET("http://photojournal.jpl.nasa.gov/tiff/PIA19330.tif", parameters: nil)
+			var alreadyCheckedProgressIncremented: Bool = false
+			opt.progress = { progress in
+				if progress > 0 && !alreadyCheckedProgressIncremented {
+					alreadyCheckedProgressIncremented = true
+					XCTAssert(true, "Pass")
+					expectation2.fulfill()
+				}
+			}
+			opt.start { response in
+				if response.error != nil {
+					XCTAssert(false, "Failure")
+				}
+				XCTAssert(true, "Pass")
+				expectation1.fulfill()
+			}
+		} catch {
+			XCTAssert(false, "Failure")
+		}
+
+		waitForExpectations(timeout: 30, handler: nil)
+	}
+	
     func testOperationDependencies() {
-        let expectation1 = expectationWithDescription("testOperationDependencies1")
-        let expectation2 = expectationWithDescription("testOperationDependencies2")
-        
-        let operationQueue = NSOperationQueue()
-        operationQueue.maxConcurrentOperationCount = 2
+        let expectation1 = expectation(description: "testOperationDependencies1")
+        let expectation2 = expectation(description: "testOperationDependencies2")
         
         var operation1Finished = false
         
         let urlString1 = "http://photojournal.jpl.nasa.gov/tiff/PIA19330.tif" // (4.32 MB)
         let urlString2 = "http://photojournal.jpl.nasa.gov/jpeg/PIA19330.jpg" // (0.14 MB)
         
-        let request1 = HTTPTask()
-        let op1 = request1.create(urlString1, method: .GET, parameters: nil, completionHandler: { (response) -> Void in
-            if let err = response.error {
-                XCTFail("request1 failed: \(err.localizedDescription)")
+        let operationQueue = OperationQueue()
+        operationQueue.maxConcurrentOperationCount = 2
+        
+        do {
+            let opt1 = try HTTP.GET(urlString1, parameters: nil)
+            opt1.onFinish = { response in
+                if let err = response.error {
+                    XCTFail("request1 failed: \(err.localizedDescription)")
+                }
+                operation1Finished = true
+                expectation1.fulfill()
             }
-            operation1Finished = true
-            expectation1.fulfill()
-        })
-        
-        let request2 = HTTPTask()
-        let op2 = request2.create(urlString2, method: .GET, parameters: nil, completionHandler: { (response) -> Void in
-            if let err = response.error {
-                XCTFail("request2 failed: \(err.localizedDescription)")
+            
+            let opt2 = try HTTP.GET(urlString2, parameters: nil)
+            opt2.onFinish = { response in
+                if let err = response.error {
+                    XCTFail("request2 failed: \(err.localizedDescription)")
+                }
+                XCTAssert(operation1Finished, "Operation 1 did not finish first")
+                expectation2.fulfill()
             }
-            XCTAssert(operation1Finished, "Operation 1 did not finish first")
-            expectation2.fulfill()
-        })
+            
+            opt2.addDependency(opt1)
+            operationQueue.addOperation(opt1)
+            operationQueue.addOperation(opt2)
+            
+        } catch {
+            XCTAssert(false, "Failure")
+        }
         
-        op2?.addDependency(op1!)
-        operationQueue.addOperation(op1!)
-        operationQueue.addOperation(op2!)
-        
-        waitForExpectationsWithTimeout(30, handler: nil)
+        waitForExpectations(timeout: 30, handler: nil)
     }
 }
