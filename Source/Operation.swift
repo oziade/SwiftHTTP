@@ -432,12 +432,13 @@ open class HTTP: Operation {
     /**
     Class method to create a HTTP request that handles the NSMutableURLRequest and parameter encoding for you.
     */
-    open class func New(_ url: String, method: HTTPVerb, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), isDownload: Bool = false) throws -> HTTP  {
+    open class func New(_ url: String, method: HTTPVerb, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), isDownload: Bool = false, cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) throws -> HTTP  {
         guard let req = NSMutableURLRequest(urlString: url) else { throw HTTPOptError.invalidRequest }
         if let handler = DelegateManager.sharedInstance.requestHandler {
             handler(req)
         }
         req.verb = method
+        req.cachePolicy = cachePolicy
         if let params = parameters {
             try requestSerializer.serialize(req, parameters: params)
         }
