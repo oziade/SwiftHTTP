@@ -379,52 +379,52 @@ open class HTTP: Operation {
     Class method to create a GET request that handles the NSMutableURLRequest and parameter encoding for you.
     */
     open class func GET(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil,
-        requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer()) throws -> HTTP  {
-        return try HTTP.New(url, method: .GET, parameters: parameters, headers: headers, requestSerializer: requestSerializer)
+        requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) throws -> HTTP  {
+        return try HTTP.New(url, method: .GET, parameters: parameters, headers: headers, requestSerializer: requestSerializer, cachePolicy: cachePolicy)
     }
     
     /**
     Class method to create a HEAD request that handles the NSMutableURLRequest and parameter encoding for you.
     */
-    open class func HEAD(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer()) throws -> HTTP  {
-        return try HTTP.New(url, method: .HEAD, parameters: parameters, headers: headers, requestSerializer: requestSerializer)
+    open class func HEAD(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) throws -> HTTP  {
+        return try HTTP.New(url, method: .HEAD, parameters: parameters, headers: headers, requestSerializer: requestSerializer, cachePolicy: cachePolicy)
     }
     
     /**
     Class method to create a DELETE request that handles the NSMutableURLRequest and parameter encoding for you.
     */
-    open class func DELETE(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer()) throws -> HTTP  {
-        return try HTTP.New(url, method: .DELETE, parameters: parameters, headers: headers, requestSerializer: requestSerializer)
+    open class func DELETE(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) throws -> HTTP  {
+        return try HTTP.New(url, method: .DELETE, parameters: parameters, headers: headers, requestSerializer: requestSerializer, cachePolicy: cachePolicy)
     }
     
     /**
     Class method to create a POST request that handles the NSMutableURLRequest and parameter encoding for you.
     */
-    open class func POST(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer()) throws -> HTTP  {
-        return try HTTP.New(url, method: .POST, parameters: parameters, headers: headers, requestSerializer: requestSerializer)
+    open class func POST(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) throws -> HTTP  {
+        return try HTTP.New(url, method: .POST, parameters: parameters, headers: headers, requestSerializer: requestSerializer, cachePolicy: cachePolicy)
     }
     
     /**
     Class method to create a PUT request that handles the NSMutableURLRequest and parameter encoding for you.
     */
     open class func PUT(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil,
-        requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer()) throws -> HTTP  {
-        return try HTTP.New(url, method: .PUT, parameters: parameters, headers: headers, requestSerializer: requestSerializer)
+        requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) throws -> HTTP  {
+        return try HTTP.New(url, method: .PUT, parameters: parameters, headers: headers, requestSerializer: requestSerializer, cachePolicy: cachePolicy)
     }
     
     /**
     Class method to create a PUT request that handles the NSMutableURLRequest and parameter encoding for you.
     */
-    open class func PATCH(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer()) throws -> HTTP  {
-        return try HTTP.New(url, method: .PATCH, parameters: parameters, headers: headers, requestSerializer: requestSerializer)
+    open class func PATCH(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil, requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) throws -> HTTP  {
+        return try HTTP.New(url, method: .PATCH, parameters: parameters, headers: headers, requestSerializer: requestSerializer, cachePolicy: cachePolicy)
     }
     
     /**
      Class method to create a Download request that handles the NSMutableURLRequest and parameter encoding for you.
      */
     open class func Download(_ url: String, parameters: HTTPParameterProtocol? = nil, headers: [String:String]? = nil,
-                             requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), completion:@escaping ((URL) -> Void)) throws -> HTTP  {
-        let task = try HTTP.New(url, method: .GET, parameters: parameters, headers: headers, requestSerializer: requestSerializer, isDownload: true)
+                             requestSerializer: HTTPSerializeProtocol = HTTPParameterSerializer(), cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy, completion:@escaping ((URL) -> Void)) throws -> HTTP  {
+        let task = try HTTP.New(url, method: .GET, parameters: parameters, headers: headers, requestSerializer: requestSerializer, isDownload: true, cachePolicy: cachePolicy)
         task.downloadHandler = completion
         return task
     }
